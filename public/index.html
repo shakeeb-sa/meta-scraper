@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Scraper Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Meta Title & Description Scraper</h1>
+        <p>Paste your URLs below (one per line, or separated by commas/spaces). Duplicates will be removed automatically.</p>
+        
+        <textarea id="urls-input" rows="10" placeholder="https://www.example.com&#10;https://www.anotherexample.org&#10;..."></textarea>
+        
+        <button id="generate-btn">Generate</button>
+        <!-- Add this code right after the "Generate" button -->
+<div id="download-container" style="display: none;">
+    <h3>Download Results</h3>
+    <button id="download-txt" class="download-btn">Download .txt</button>
+    <button id="download-docx" class="download-btn">Download .docx</button>
+    <button id="download-xlsx" class="download-btn">Download .xlsx</button>
+</div>
+
+        <div id="loader" class="loader" style="display: none;"></div>
+
+        <div id="results-container">
+            <!-- Scraped results will be dynamically inserted here -->
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

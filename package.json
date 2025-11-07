@@ -1,0 +1,17 @@
+{
+  "name": "meta-scraper",
+  "version": "1.0.0",
+  "description": "A tool to scrape meta title and description from multiple URLs.",
+  "main": "api/index.js",
+  "scripts": {
+    "start": "node api/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "docx": "^8.2.2",
+    "express": "^4.18.2",
+    "xlsx": "^0.18.5"
+  }
+}
