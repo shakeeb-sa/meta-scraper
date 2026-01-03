@@ -1,5 +1,4 @@
 {
-  "version": 2,
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -7,20 +6,7 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/client/$1"
-    }
-  ],
-  "builds": [
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "destination": "/index.html"
     }
   ]
 }

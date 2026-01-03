@@ -5,9 +5,8 @@ const cheerio = require('cheerio');
 
 const app = express();
 
-// Allow requests from anywhere (or configure specific domains in production)
 app.use(cors());
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json());
 
 // Helper Function
 const scrapeUrl = async (url) => {
@@ -16,7 +15,8 @@ const scrapeUrl = async (url) => {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       },
-      timeout: 10000 
+      // LOWER TIMEOUT: Set to 6s so we respond before Vercel kills the function at 10s
+      timeout: 6000 
     });
 
     const $ = cheerio.load(data);
@@ -30,6 +30,7 @@ const scrapeUrl = async (url) => {
     };
 
   } catch (error) {
+    console.error(`Error scraping ${url}:`, error.message);
     return {
       status: 'error',
       url,
@@ -38,17 +39,18 @@ const scrapeUrl = async (url) => {
   }
 };
 
-// Main Endpoint
-app.post('/api/scrape', async (req, res) => {
-  const { urls } = req.body;
-
-  if (!urls || !Array.isArray(urls) || urls.length === 0) {
-    return res.status(400).json({ message: 'Please provide an array of URLs.' });
-  }
-
-  const uniqueUrls = [...new Set(urls.filter(url => url.trim() !== ''))];
-
+// HANDLER FUNCTION
+const handleScrape = async (req, res) => {
   try {
+    const { urls } = req.body;
+
+    if (!urls || !Array.isArray(urls) || urls.length === 0) {
+      return res.status(400).json({ message: 'Please provide an array of URLs.' });
+    }
+
+    const uniqueUrls = [...new Set(urls.filter(url => url.trim() !== ''))];
+    
+    // Scrape
     const scrapePromises = uniqueUrls.map(url => scrapeUrl(url));
     const settledResults = await Promise.allSettled(scrapePromises);
     
@@ -60,10 +62,18 @@ app.post('/api/scrape', async (req, res) => {
     res.json({ data: responseData });
 
   } catch (error) {
-    res.status(500).json({ message: 'Internal server error.' });
+    console.error("Critical Server Error:", error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
   }
-});
+};
 
-// For Vercel, we export the app. 
-// Vercel handles the server listening automatically.
+// ROUTING FIX:
+// Vercel sometimes strips the path, sometimes it doesn't. 
+// We listen on both to be safe.
+app.post('/api/scrape', handleScrape);
+app.post('/', handleScrape);
+
+// Health check to verify API is running
+app.get('/api/scrape', (req, res) => res.send('Scraper API is running! Send a POST request.'));
+
 module.exports = app;
