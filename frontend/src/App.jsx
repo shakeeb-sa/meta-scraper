@@ -51,20 +51,22 @@ function App() {
   const getSuccessfulResults = () => results.filter(r => r.status === 'success');
 
   // --- Download Handlers ---
+  // --- Download Handlers (Updated for MERN Objects) ---
   const downloadTxt = () => {
-    const data = getSuccessfulResults().map(item => item.result).join('\n\n');
+    const data = getSuccessfulResults().map(item => 
+      `URL: ${item.url}\nTITLE: ${item.title}\nDESC: ${item.description}`
+    ).join('\n\n---\n\n');
     const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
     saveAs(blob, 'meta_results.txt');
   };
 
   const downloadXlsx = () => {
-    const data = getSuccessfulResults().map(item => {
-      const parts = item.result.split(';');
-      return { 
-        Title: parts[0] ? parts[0].trim() : '', 
-        Description: parts.slice(1).join(';').trim() || '' 
-      };
-    });
+    const data = getSuccessfulResults().map(item => ({ 
+      URL: item.url,
+      Title: item.title, 
+      Description: item.description,
+      SEO_Score: item.seoScore + '%'
+    }));
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Meta Results");
@@ -76,13 +78,16 @@ function App() {
       new Paragraph({
         children: [
           new ExternalHyperlink({
-            children: [new TextRun({ text: item.url, style: "Hyperlink" })],
+            children: [new TextRun({ text: item.url, color: "0000FF", underline: true })],
             link: item.url,
           }),
         ],
       }),
       new Paragraph({
-        children: [new TextRun({ text: item.result, size: 22 })],
+        children: [new TextRun({ text: `Title: ${item.title}`, bold: true, size: 24 })],
+      }),
+      new Paragraph({
+        children: [new TextRun({ text: item.description, size: 22 })],
       }),
       new Paragraph({ text: "" })
     ]);
