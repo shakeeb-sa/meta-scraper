@@ -217,3 +217,14 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.history-item:hover {
+  background: #f0ebff !important;
+  border-color: #7b68ee !important;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: row; /* Horizontal layout for Sidebar + Main */
+  min-height: 100vh;
+}
